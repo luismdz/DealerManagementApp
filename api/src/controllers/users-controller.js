@@ -52,7 +52,7 @@ exports.login = (req, res) => {
 };
 
 exports.createUser = (req, res) => {
-	const { isAdmin } = req.userData;
+	const { isAdmin, userId } = req.userData;
 
 	if (!isAdmin) {
 		return res.status(401).json({ message: 'Auth invalid' });
@@ -128,11 +128,11 @@ exports.getById = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-	const { isAdmin } = req.userData;
+	// const { isAdmin } = req.userData;
 
-	if (!isAdmin) {
-		return res.status(401).json({ message: 'Auth invalid' });
-	}
+	// if (!isAdmin) {
+	// 	return res.status(401).json({ message: 'Auth invalid' });
+	// }
 
 	const id = req.params.id;
 

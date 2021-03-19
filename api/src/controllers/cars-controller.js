@@ -1,4 +1,4 @@
-const carModel = require('../models/cars-model');
+const carsModel = require('../models/cars-model');
 
 exports.createCar = (req, res) => {
 	const { userId } = req.userData;
@@ -7,30 +7,30 @@ exports.createCar = (req, res) => {
 		return res.status(401).json({ message: 'Auth invalid' });
 	}
 
-	res.status(200).json();
+	const { year, carModelId, color, dealerId } = req.body;
 
-	// const { firstName, lastName, email, age, password } = req.body;
+	if ((!year || !carModelId, !color)) {
+		return res
+			.status(400)
+			.json({ message: 'All fields [year, carModelId, color] are required' });
+	}
 
-	// if (!firstName || !lastName || !email || !password) {
-	// 	return res.status(400).json({
-	// 		message:
-	// 			'All the fields [firstName, lastName, email, password] are required',
-	// 	});
-	// }
+	const newCar = {
+		year,
+		carModelId,
+		color,
+		dealerId,
+		createdById: userId,
+	};
 
-	// carModel
-	// 			.createUser(newUser)
-	// 			.then((resp) => res.status(200).json(resp))
-	// 			.catch((err) =>
-	// 				res.status(400).json({
-	// 					message: 'Cannot create user',
-	// 					error: err,
-	// 				})
-	// 			);
+	carsModel
+		.createCar(newCar)
+		.then((resp) => res.status(200).json(resp))
+		.catch((error) => res.status(400).json(error));
 };
 
 exports.getCars = (req, res) => {
-	carModel
+	carsModel
 		.getAllCars()
 		.then((cars) => res.status(200).json(cars))
 		.catch((err) => {
@@ -41,12 +41,12 @@ exports.getCars = (req, res) => {
 
 exports.getCarBrands = async (req, res) => {
 	try {
-		let brands = await carModel.getCarBrands();
+		let brands = await carsModel.getCarBrands();
 
 		if (brands && brands.length > 0) {
 			brands = await Promise.all(
 				brands.map(async (brand) => {
-					const models = await carModel.getCarModelsByBrandId(brand.id);
+					const models = await carsModel.getCarModelsByBrandId(brand.id);
 
 					return {
 						...brand,
@@ -67,91 +67,102 @@ exports.getCarBrands = async (req, res) => {
 	}
 };
 
-// exports.getCarModelsByBrandId = (req, res) => {};
+exports.getCarModelsByBrandId = (req, res) => {
+	const id = req.query.brandId;
+
+	if (!id) {
+		return res.status(400).json({ message: 'Param BrandId is required' });
+	}
+
+	carsModel
+		.getCarModelsByBrandId(id)
+		.then((models) => res.status(200).json(models))
+		.catch((error) =>
+			res.status(400).json({ message: 'Invalid request', error: error })
+		);
+};
+
 // exports.getCarModels = (req, res) => {};
 
 exports.getById = (req, res) => {
 	const id = req.params.id;
 
-	// userModel
-	// 	.getUserById(id)
-	// 	.then((user) => {
-	// 		if (!user) {
-	// 			return res.status(404).json({
-	// 				message: `No user with id ${id}`,
-	// 			});
-	// 		}
-	// 		const { password, ...userWithoutPassword } = user;
-	// 		return res.status(200).json(userWithoutPassword);
-	// 	})
-	// 	.catch((err) =>
-	// 		res.status(400).json({
-	// 			message: 'Invalid request',
-	// 			error: err,
-	// 		})
-	// 	);
+	carsModel
+		.getCarById(id)
+		.then((car) => {
+			if (!car) {
+				return res.status(404).json({ message: 'Car Not Found' });
+			}
+
+			return res.status(200).json(car);
+		})
+		.catch((error) => res.status(400).json({ message: 'Invalid request' }));
 };
 
-exports.updateCar = (req, res) => {
+exports.updateCar = async (req, res) => {
 	const { userId } = req.userData;
 
 	if (!userId) {
 		return res.status(401).json({ message: 'Auth invalid' });
 	}
 
-	const id = req.params.id;
+	try {
+		const id = req.params.id;
 
-	// const user = {
-	// 	firstName: req.body.firstName,
-	// 	lastName: req.body.lastName,
-	// 	age: req.body.age,
-	// };
+		const carFromDb = await carsModel.getCarById(id);
 
-	// userModel
-	// 	.updateUser(id, user)
-	// 	.then((resp) => {
-	// 		if (resp.affectedRows > 0)
-	// 			return res.status(200).json({
-	// 				message: 'User Updated',
-	// 			});
-	// 		else
-	// 			return res.status(404).json({
-	// 				message: 'User Not Found',
-	// 			});
-	// 	})
-	// 	.catch((err) =>
-	// 		res.status(400).json({
-	// 			message: 'Invalid request',
-	// 			error: err,
-	// 		})
-	// 	);
+		if (!carFromDb) {
+			return res.status(404).json({ message: 'Car not found' });
+		}
+
+		if (carFromDb.createdById !== userId) {
+			return res.status(401).json({ message: 'Auth invalid' });
+		}
+
+		const car = {
+			year: req.body.year,
+			color: req.body.color,
+			carModelId: req.body.carModelId,
+		};
+
+		carsModel
+			.updateCar(id, car)
+			.then((resp) => res.status(200).json(resp))
+			.catch((error) =>
+				res.status(400).json({ message: 'Invalid request', error })
+			);
+	} catch (error) {
+		return res.status(400).json({ message: 'Invalid request' });
+	}
 };
 
-exports.deleteCar = (req, res) => {
+exports.deleteCar = async (req, res) => {
 	const { userId } = req.userData;
 
 	if (!userId) {
 		return res.status(401).json({ message: 'Auth invalid' });
 	}
 
-	// const id = req.params.id;
+	try {
+		const id = req.params.id;
 
-	// userModel
-	// 	.deleteUser(id)
-	// 	.then((resp) => {
-	// 		console.log(resp);
-	// 		if (resp.affectedRows > 0) {
-	// 			return res.status(204).json();
-	// 		}
+		const carFromDb = await carsModel.getCarById(id);
 
-	// 		return res.status(404).json({
-	// 			message: `No user with id ${id}`,
-	// 		});
-	// 	})
-	// 	.catch((err) =>
-	// 		res.status(400).json({
-	// 			message: 'Invalid request',
-	// 			error: err,
-	// 		})
-	// 	);
+		if (!carFromDb) {
+			return res.status(404).json({ message: 'Car not found' });
+		}
+
+		if (carFromDb.createdById !== userId) {
+			return res.status(401).json({ message: 'Auth invalid' });
+		}
+
+		carsModel
+			.deleteCar(id)
+			.then((resp) => res.status(200).json(resp))
+			.catch((error) =>
+				res.status(400).json({ message: 'Invalid request', error })
+			);
+	} catch (error) {
+		return res.status(400).json({ message: 'Invalid request' });
+	}
 };
