@@ -1,5 +1,5 @@
-const dealersModel = require('../models/dealers-model');
 const dealerModel = require('../models/dealers-model');
+const carModel = require('../models/cars-model');
 
 exports.createDealer = async (req, res) => {
 	const { userId } = req.userData;
@@ -48,7 +48,7 @@ exports.getDealers = (req, res) => {
 		.catch((error) => res.status(400).json({ message: error }));
 };
 
-exports.getDealersByUserId = (req, res) => {
+exports.getDealerByUserId = (req, res) => {
 	const { userId } = req.userData;
 
 	if (!userId) {
@@ -62,11 +62,6 @@ exports.getDealersByUserId = (req, res) => {
 };
 
 exports.getDealerById = (req, res) => {
-	// const { userId } = req.userData;
-
-	// if (!userId) {
-	// 	return res.status(401).json({ message: 'Auth failed' });
-	// }
 	const id = req.params.id;
 
 	dealerModel
@@ -79,6 +74,44 @@ exports.getDealerById = (req, res) => {
 		.catch((error) => res.status(400).json({ message: error }));
 };
 
+// Get dealer stock (cars available)
+exports.getDealerStock = async (req, res) => {
+	try {
+		const id = req.params.id;
+		if (!id) {
+			return res.status(400).json({ message: 'Invalid request' });
+		}
+
+		const dealer = await dealerModel.getDealerById(id);
+
+		if (!dealer) {
+			return res.status(404).json({ message: 'Dealer not found' });
+		}
+
+		let carsAvailable = await carModel.getCarsByDealerId(dealer.id);
+
+		carsAvailable = carsAvailable.map((car) => {
+			return {
+				id: car.id,
+				brand: car.brand,
+				model: car.model,
+				color: car.color,
+				year: car.year,
+			};
+		});
+
+		const dealerStock = {
+			...dealer,
+			carsAvailable,
+		};
+
+		return res.status(200).json(dealerStock);
+	} catch (error) {
+		res.status(400).json({ message: 'Invalid Request', error: error });
+		throw error;
+	}
+};
+
 exports.updateDealer = async (req, res) => {
 	const { userId } = req.userData;
 
@@ -89,7 +122,7 @@ exports.updateDealer = async (req, res) => {
 	try {
 		const id = req.params.id;
 
-		const dealerFromDb = await dealersModel.getDealerById(id);
+		const dealerFromDb = await dealerModel.getDealerById(id);
 
 		if (!dealerFromDb) {
 			return res.status(404).json({ message: 'Dealer not found' });
@@ -127,7 +160,7 @@ exports.deleteDealer = async (req, res) => {
 	try {
 		const id = req.params.id;
 
-		const dealerFromDb = await dealersModel.getDealerById(id);
+		const dealerFromDb = await dealerModel.getDealerById(id);
 
 		if (!dealerFromDb) {
 			return res.status(404).json({ message: 'Dealer not found' });

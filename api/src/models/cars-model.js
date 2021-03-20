@@ -143,12 +143,12 @@ class Car {
 			const sql = `
 				select
 					c.id,
-					cb.name as Brand,
-					cm.name as Model,
+					cb.name as brand,
+					cm.name as model,
 					c.color,
 					c.year,
 					dc.dealerId,
-					d.name as Dealer,
+					d.name as dealer,
 					c.createdById,
 					c.createdAt
 				from cars c
@@ -165,6 +165,37 @@ class Car {
 				}
 
 				return resolve(rows[0]);
+			});
+		});
+	};
+
+	getCarsByDealerId = (id) => {
+		return new Promise((resolve, reject) => {
+			const sql = `
+				select distinct
+					c.id,
+					cb.name as brand,
+					cm.name as model,
+					c.color,
+					c.year,
+					dc.dealerId,
+					d.name as Dealer,
+					c.createdById,
+					c.createdAt
+			from cars c
+			left join dealer_cars dc on dc.carId = c.id
+			left join dealers d on d.id = dc.dealerId
+			left join carbrand_models cm on cm.id = c.carModelId
+			left join carbrands cb on cb.id = cm.brandId
+			where d.id = ?`;
+
+			db.query(sql, [id], (err, rows) => {
+				if (err) {
+					reject(err);
+					throw err;
+				}
+
+				return resolve(rows);
 			});
 		});
 	};
