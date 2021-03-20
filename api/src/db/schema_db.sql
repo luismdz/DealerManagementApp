@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS test_dealers_db;
 CREATE DATABASE IF NOT EXISTS test_dealers_db;
 
 use test_dealers_db;
@@ -28,28 +29,28 @@ create table Dealers (
 		references Users(id) on update cascade
 );
 
-create table CarManufactures (
+create table CarBrands (
 	id int primary key auto_increment,
     name varchar(128) not null default ''
 );
 
-create table CarManufacture_Models (
+create table CarBrand_Models (
 	id int primary key auto_increment,
     name varchar(128) not null default '',
-    marcaId int not null,
-	constraint fk_model_manufacture foreign key(marcaId)
-		references CarManufactures(id) on update cascade on delete cascade
+    brandId int not null,
+	constraint fk_model_manufacture foreign key(brandId)
+		references CarBrands(id) on update cascade on delete cascade
 );
 
 create table Cars (
 	id int primary key auto_increment,
 	year int not null default 0,
 	color varchar(50) not null default '',
-    modeloId int not null,
+    carModelId int not null,
     createdById int not null,
     createdAt datetime not null default current_timestamp,
-	constraint fk_car_model_manufacture foreign key(modeloId)
-		references CarManufacture_Models(id) on update cascade on delete cascade,
+	constraint fk_car_model_manufacture foreign key(carModelId)
+		references CarBrand_Models(id) on update cascade on delete cascade,
 	constraint fk_car_user foreign key(createdById)
 		references Users(id) on update cascade
 );

@@ -8,7 +8,7 @@ class User {
 					u.*,
 					adm.status as isAdmin
 				from users u
-				inner join admins adm on adm.userId = u.id
+				left join admins adm on adm.userId = u.id
 				where u.email = ?`;
 
 			db.query(sql, [user.email], (err, rows) => {
@@ -102,7 +102,7 @@ class User {
 						reject(err);
 						throw err;
 					}
-					console.log(rows);
+
 					resolve(rows);
 				});
 			} else return reject('No values provided');
