@@ -20,4 +20,8 @@ export class CarListComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  eliminar(carId) {
+    console.log(carId);
+  }
 }

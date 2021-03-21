@@ -26,11 +26,13 @@ export class UserService {
   }
 
   getUsers() {
-    return this.http.get(this.apiUrl);
+    return this.http
+      .get<UserDto[]>(this.apiUrl)
+      .pipe(map((users) => users.filter((user) => !user.isAdmin)));
   }
 
   getUserById(id: number) {
-    return this.http.get(`${this.apiUrl}/${id}`);
+    return this.http.get<UserDto>(`${this.apiUrl}/${id}`);
   }
 
   createUser(user: UserDto) {

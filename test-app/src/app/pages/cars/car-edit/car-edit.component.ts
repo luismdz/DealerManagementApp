@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-car-edit',
@@ -20,11 +20,14 @@ export class CarEditComponent implements OnInit {
   brands: CarBrandDto[] = [];
   models: CarModelDto[] = [];
   years: number[] = [];
+  editMode = false;
+  currentId: number;
 
   constructor(
     private fb: FormBuilder,
     private carSvc: CarService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.initForm();
 
@@ -49,7 +52,34 @@ export class CarEditComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.route.params.subscribe((params) => {
+      const id = params['id'];
+
+      if (id) {
+        this.carSvc.getById(id).subscribe(
+          (car) => {
+            if (car) {
+              this.editMode = true;
+              this.currentId = id;
+
+              const data = {
+                brand: this.brands
+                  .filter((brand) => brand.name === car.brand)
+                  .map((b) => b.id)[0],
+                model: car.carModelId,
+                color: car.color,
+                year: car.year,
+              };
+
+              this.form.patchValue(data);
+            }
+          },
+          (error) => console.log(error)
+        );
+      }
+    });
+  }
 
   // Getters
   get brand() {
@@ -81,17 +111,26 @@ export class CarEditComponent implements OnInit {
   createCar() {
     const { model, color, year } = this.form.value;
 
-    const newCar: CarDto = {
+    const carData: CarDto = {
       carModelId: model,
       color,
       year,
     };
 
-    this.carSvc.createCar(newCar).subscribe(
-      (resp) => {
-        this.router.navigateByUrl(`/dealers/${resp}`);
-      },
-      (error) => console.log(error)
-    );
+    if (this.editMode) {
+      this.carSvc.updateCar(this.currentId, carData).subscribe(
+        (resp) => {
+          this.router.navigateByUrl(`/dealers/user`);
+        },
+        (error) => console.log(error)
+      );
+    } else {
+      this.carSvc.createCar(carData).subscribe(
+        (resp) => {
+          this.router.navigateByUrl(`/dealers/user`);
+        },
+        (error) => console.log(error)
+      );
+    }
   }
 }

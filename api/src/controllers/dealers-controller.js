@@ -1,5 +1,6 @@
 const dealerModel = require('../models/dealers-model');
 const carModel = require('../models/cars-model');
+const userModel = require('../models/users-model');
 
 exports.createDealer = async (req, res) => {
 	const { isAdmin } = req.userData;
@@ -80,7 +81,9 @@ exports.getDealerById = (req, res) => {
 
 			return res.status(200).json(dealerDto);
 		})
-		.catch((error) => res.status(400).json({ message: error }));
+		.catch((error) =>
+			res.status(400).json({ message: 'Invalid request', error })
+		);
 };
 
 // Get dealer stock (cars available)
@@ -179,7 +182,14 @@ exports.deleteDealer = async (req, res) => {
 
 		dealerModel
 			.deleteDealer(id)
-			.then((resp) => res.status(204).json(resp))
+			.then((resp) => {
+				userModel
+					.deleteUser(dealerFromDb.userId)
+					.then((resp) => res.status(204).json(resp))
+					.catch((error) =>
+						res.status(400).json({ message: 'Invalid request', error: error })
+					);
+			})
 			.catch((err) =>
 				res.status(400).json({ message: 'Invalid request', error: err })
 			);

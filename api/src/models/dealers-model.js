@@ -17,9 +17,10 @@ class Dealer {
 	getAll = () => {
 		return new Promise((resolve, reject) => {
 			const sql = `
-					select id, name, userId 
-					from Dealers 
-					where status = 1`;
+					select d.id, d.name, d.userId 
+					from Dealers d
+					left join Users u on u.id = d.userId
+					where d.status = 1 and u.status = 1`;
 
 			db.query(sql, (err, rows) => {
 				if (err) {
@@ -52,11 +53,13 @@ class Dealer {
 		return new Promise((resolve, reject) => {
 			const sql = `select * from Dealers d 
 						where id = ? and status = 1`;
+
 			db.query(sql, [id], (err, rows) => {
 				if (err) {
 					reject(err);
 					throw err;
 				}
+
 				return resolve(rows[0]);
 			});
 		});
@@ -65,8 +68,8 @@ class Dealer {
 	getDealerByName = (name) => {
 		return new Promise((resolve, reject) => {
 			const sql = `select id, name from Dealers d 
-						where name like '%${name}%' and status = 1`;
-			db.query(sql, (err, rows) => {
+						where lower(name) = ? and status = 1`;
+			db.query(sql, [name.toLowerCase()], (err, rows) => {
 				if (err) {
 					reject(err);
 					throw err;

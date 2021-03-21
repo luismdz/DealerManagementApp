@@ -39,12 +39,12 @@
 
       <mat-menu #menuRef="matMenu">
         <button mat-menu-item
-          [routerLink]="['edit', dealer?.id]">
+          [routerLink]="['/cars/edit', car?.id]">
           Editar
         </button>
 
         <button mat-menu-item
-          (click)="eliminar(dealer?.id)">
+          (click)="eliminar(car.id)">
           Eliminar
         </button>
       </mat-menu>

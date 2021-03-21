@@ -63,7 +63,8 @@ class User {
 					adm.status as isAdmin
 				from users u
 				left join admins adm on adm.userId = u.id
-				left join dealers d on d.userId = u.id`;
+				left join dealers d on d.userId = u.id
+				where u.status = 1`;
 
 			db.query(sql, (err, rows) => {
 				if (err) {
@@ -85,9 +86,31 @@ class User {
 				from users u
 				left join admins adm on adm.userId = u.id
 				left join dealers d on d.userId = u.id
-				where u.id = ?`;
+				where u.status = 1 and u.id = ?`;
 
 			db.query(sql, [id], (err, rows) => {
+				if (err) {
+					reject(err);
+					throw err;
+				}
+				resolve(rows[0]);
+			});
+		});
+	};
+
+	getUserByEmail = (email) => {
+		return new Promise((resolve, reject) => {
+			const sql = `
+				select
+					u.*,
+					d.name as dealer,
+					adm.status as isAdmin
+				from users u
+				left join admins adm on adm.userId = u.id
+				left join dealers d on d.userId = u.id
+				where lower(u.email) = ?`;
+
+			db.query(sql, [email.toLowerCase()], (err, rows) => {
 				if (err) {
 					reject(err);
 					throw err;
@@ -130,9 +153,9 @@ class User {
 
 	deleteUser = (id) => {
 		return new Promise((resolve, reject) => {
-			const sql = 'DELETE FROM user WHERE id = ?';
+			const sql = 'UPDATE Users SET status = ? WHERE id = ?';
 
-			return db.query(sql, [id], (err, rows) => {
+			return db.query(sql, [0, id], (err, rows) => {
 				if (err) {
 					reject(err);
 					throw err;
