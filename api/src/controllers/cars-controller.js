@@ -9,10 +9,10 @@ exports.createCar = (req, res) => {
 
 	const { year, carModelId, color, dealerId } = req.body;
 
-	if ((!year || !carModelId, !color)) {
-		return res
-			.status(400)
-			.json({ message: 'All fields [year, carModelId, color] are required' });
+	if ((!year || !carModelId, !color, !dealerId)) {
+		return res.status(400).json({
+			message: 'All fields [year, carModelId, color, dealerId] are required',
+		});
 	}
 
 	const newCar = {
@@ -78,8 +78,6 @@ exports.getCarModelsByBrandId = (req, res) => {
 			res.status(400).json({ message: 'Invalid request', error: error })
 		);
 };
-
-// exports.getCarModels = (req, res) => {};
 
 exports.getById = (req, res) => {
 	const id = req.params.id;

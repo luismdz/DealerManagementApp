@@ -50,7 +50,10 @@ class Car {
 						});
 					});
 				});
-			} catch (error) {}
+			} catch (error) {
+				reject(error);
+				throw error;
+			}
 		});
 	};
 

@@ -1,0 +1,85 @@
+<div class="form-container">
+
+  <form [formGroup]="form"
+    (ngSubmit)="createCar()"
+    class="mat-elevation-z1">
+
+    <h2>Crear Vehiculo</h2>
+
+    <mat-form-field appearance="">
+      <mat-label>Marca</mat-label>
+
+      <mat-select placeholder="Seleccione la Marca"
+        formControlName="brand">
+        <mat-option [value]="brand.id"
+          *ngFor="let brand of brands">
+          {{ brand.name }}
+        </mat-option>
+      </mat-select>
+
+      <mat-error *ngIf="brand.errors?.required">
+        El campo Marca es requerido
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="">
+      <mat-label>Modelo</mat-label>
+
+      <mat-select placeholder="Seleccione el Modelo"
+        formControlName="model">
+        <mat-option *ngIf="!brand.value">
+          Primero debe seleccionar la marca
+        </mat-option>
+        <mat-option [value]="model.modelId"
+          *ngFor="let model of models">
+          {{ model.name }}
+        </mat-option>
+      </mat-select>
+
+      <mat-error *ngIf="model.errors?.required">
+        El campo Modelo es requerido
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance=""
+      class="w-50">
+      <mat-label>Color</mat-label>
+
+      <input type="text"
+        matInput
+        formControlName="color">
+
+      <mat-error *ngIf="color.errors?.required">
+        El campo Color es requerido
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance=""
+      class="w-50">
+      <mat-label>Año</mat-label>
+      <mat-select placeholder="Seleccione el Año"
+        formControlName="year">
+        <mat-option [value]="y"
+          *ngFor="let y of years">
+          {{ y }}
+        </mat-option>
+      </mat-select>
+
+      <mat-error *ngIf="year.errors?.required">
+        El campo Año es requerido
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button
+      color="primary"
+      [disabled]="form.invalid">
+      Crear
+    </button>
+
+    <mat-error *ngIf="form.invalid">
+      <small>Todos los campos son requeridos</small>
+    </mat-error>
+
+  </form>
+
+</div>

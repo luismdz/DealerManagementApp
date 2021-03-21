@@ -2,22 +2,22 @@ const dealerModel = require('../models/dealers-model');
 const carModel = require('../models/cars-model');
 
 exports.createDealer = async (req, res) => {
-	const { userId } = req.userData;
+	const { isAdmin } = req.userData;
 
-	if (!userId) {
+	if (!isAdmin) {
 		return res.status(401).json({ message: 'Auth invalid' });
 	}
 
 	const newDealer = {
 		name: req.body.name,
-		userId: userId,
+		userId: req.body.userId,
 	};
 
-	if (!newDealer.name) {
-		return res.status(400).json({ message: 'Name is required' });
+	if (!newDealer.name || !newDealer.userId) {
+		return res.status(400).json({ message: 'Name and UserId are required' });
 	}
 
-	const userHasDealer = await dealerModel.getDealerByUserId(userId);
+	const userHasDealer = await dealerModel.getDealerByUserId(newDealer.userId);
 
 	if (userHasDealer) {
 		return res
@@ -62,12 +62,21 @@ exports.getDealerByUserId = (req, res) => {
 };
 
 exports.getDealerById = (req, res) => {
+	const { userId, isAdmin } = req.userData;
 	const id = req.params.id;
 
 	dealerModel
 		.getDealerById(id)
 		.then((dealer) => {
-			const { dealerUserId, dealerStatus, ...dealerDto } = dealer;
+			if (!dealer) {
+				return res.status(404).json({ message: 'Dealer not found' });
+			}
+
+			const { dealerStatus, ...dealerDto } = dealer;
+
+			if (!isAdmin && dealerUserId != userId) {
+				return res.status(401).json({ message: 'Auth Failed' });
+			}
 
 			return res.status(200).json(dealerDto);
 		})
@@ -88,9 +97,9 @@ exports.getDealerStock = async (req, res) => {
 			return res.status(404).json({ message: 'Dealer not found' });
 		}
 
-		let carsAvailable = await carModel.getCarsByDealerId(dealer.id);
+		let stock = await carModel.getCarsByDealerId(dealer.id);
 
-		carsAvailable = carsAvailable.map((car) => {
+		stock = stock.map((car) => {
 			return {
 				id: car.id,
 				brand: car.brand,
@@ -102,7 +111,7 @@ exports.getDealerStock = async (req, res) => {
 
 		const dealerStock = {
 			...dealer,
-			carsAvailable,
+			stock,
 		};
 
 		return res.status(200).json(dealerStock);
@@ -112,6 +121,7 @@ exports.getDealerStock = async (req, res) => {
 	}
 };
 
+// Update dealer
 exports.updateDealer = async (req, res) => {
 	const { userId } = req.userData;
 
@@ -150,10 +160,11 @@ exports.updateDealer = async (req, res) => {
 	}
 };
 
+// Delete dealer
 exports.deleteDealer = async (req, res) => {
-	const { userId } = req.userData;
+	const { isAdmin } = req.userData;
 
-	if (!userId) {
+	if (!isAdmin) {
 		return res.status(401).json({ message: 'Auth failed' });
 	}
 
@@ -164,10 +175,6 @@ exports.deleteDealer = async (req, res) => {
 
 		if (!dealerFromDb) {
 			return res.status(404).json({ message: 'Dealer not found' });
-		}
-
-		if (dealerFromDb.userId !== userId) {
-			return res.status(401).json({ message: 'Auth failed' });
 		}
 
 		dealerModel

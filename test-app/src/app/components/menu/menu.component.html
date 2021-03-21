@@ -1,1 +1,25 @@
-<p>menu works!</p>
+<div class="menu-container"
+  [ngClass]="{'vertical': mode === 'vertical'}">
+
+  <div *ngIf="user?.isAdmin">
+    <a mat-button
+      [routerLink]="['/dealers']"
+      routerLinkActive="active">
+      Directorio de Dealers
+    </a>
+
+    <a mat-button
+      [routerLink]="['/users']"
+      routerLinkActive="active">
+      Usuarios
+    </a>
+  </div>
+
+  <a mat-button
+    [routerLink]="['/dealers/user']"
+    routerLinkActive="active"
+    *ngIf="user && !user?.isAdmin">
+    Mi Dealer
+  </a>
+
+</div>

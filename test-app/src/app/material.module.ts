@@ -12,7 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-
+import { MatStepperModule } from '@angular/material/stepper';
 @NgModule({
   declarations: [],
   imports: [CommonModule],
@@ -29,6 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatMenuModule,
     MatDividerModule,
     MatIconModule,
+    MatStepperModule,
   ],
 })
 export class MaterialModule {}

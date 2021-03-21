@@ -1,16 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { AdminGuard } from './auth/admin.guard';
 
 const routes: Routes = [
-  {
-    path: 'home',
-    loadChildren: () =>
-      import('./pages/home/home.module').then((m) => m.HomeModule),
-  },
   {
     path: 'dealers',
     loadChildren: () =>
       import('./pages/dealers/dealers.module').then((m) => m.DealersModule),
+  },
+  {
+    path: 'cars',
+    loadChildren: () =>
+      import('./pages/cars/cars.module').then((m) => m.CarsModule),
   },
   {
     path: 'users',
@@ -18,9 +19,13 @@ const routes: Routes = [
       import('./pages/users/users.module').then((m) => m.UsersModule),
   },
   {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
+  },
+  {
     path: '**',
     pathMatch: 'full',
-    redirectTo: 'home',
+    redirectTo: 'dealers',
   },
 ];
 

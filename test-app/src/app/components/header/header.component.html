@@ -1,7 +1,51 @@
 <mat-toolbar color="primary">
-  <span>Dealers App</span>
 
-  <span class="spacer"></span>
+  <div class="nav">
+    <!-- <button mat-icon-button
+    fxShow
+    fxHide.gt-sm
+    (click)="onToggleSidenav()">
+    <mat-icon>menu</mat-icon>
+  </button> -->
 
-  <app-menu></app-menu>
+    <span class="logo">
+      <a mat-button
+        routerLink='/'>
+        <!-- <mat-icon></mat-icon> -->
+        <span class="title">
+          Dealers App
+        </span>
+      </a>
+    </span>
+
+    <app-menu></app-menu>
+
+    <span class="spacer"></span>
+
+    <button mat-button
+      routerLink="/auth"
+      *ngIf="!user">
+      Iniciar Sesión
+    </button>
+
+    <button mat-button
+      [matMenuTriggerFor]="menuRef"
+      *ngIf="user">
+      <span>Hola, {{ user.email }}</span>
+      <mat-icon class="mat-18">more_vert</mat-icon>
+    </button>
+
+    <mat-menu #menuRef="matMenu">
+      <button mat-menu-item
+        [routerLink]="['/users/edit', user?.id]">
+        Editar Perfil
+      </button>
+
+      <button mat-menu-item
+        (click)="authSvc.logout()">
+        Cerrar Sesión
+      </button>
+    </mat-menu>
+  </div>
+
 </mat-toolbar>

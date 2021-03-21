@@ -1,0 +1,41 @@
+<div class="form-container">
+
+  <form [formGroup]="dealerForm"
+    (ngSubmit)="editarDealer()"
+    class="mat-elevation-z1">
+
+    <h2>Editar Dealer</h2>
+
+    <mat-form-field>
+      <mat-label>Nombre</mat-label>
+      <input matInput
+        formControlName="name"
+        placeholder="Nombre del Dealer"
+        required>
+      <mat-error *ngIf="dealerForm.get('name').errors?.required">
+        Campo Nombre es requerido
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Usuario</mat-label>
+      <input matInput
+        formControlName="user"
+        placeholder="Usuario del Dealer"
+        required>
+    </mat-form-field>
+
+    <button mat-raised-button
+      color="primary">
+      Guardar cambios
+    </button>
+
+    <button mat-raised-button
+      type="button"
+      color="warn"
+      routerLink="/dealers">
+      Cancelar
+    </button>
+  </form>
+
+</div>

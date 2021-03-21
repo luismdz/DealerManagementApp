@@ -1,0 +1,18 @@
+<div class="dealer-container"
+  *ngIf="dealer">
+
+  <div class="top-content">
+    <h2>{{ dealer.name }}</h2>
+  </div>
+
+  <button mat-raised-button
+    *ngIf="routePath === 'user'"
+    color="primary"
+    routerLink="/cars/edit">Agregar Vehiculo</button>
+
+  <div class="stock">
+    <h3>Inventario de Vehiculos</h3>
+    <app-car-list [cars]="dealer.stock"></app-car-list>
+  </div>
+
+</div>

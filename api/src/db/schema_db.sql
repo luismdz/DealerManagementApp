@@ -63,4 +63,13 @@ create table Dealer_Cars (
         references Dealers(id) on update cascade on delete cascade,
     constraint fk_dealerCars_car foreign key(carId)
         references Cars(id) on update cascade on delete cascade
-)
+);
+
+
+insert into Users(firstName, lastName, age, email, password)
+values ('admin', '', default, 'admin@test.com', 'admin123');
+
+insert into admins(userId)
+select id
+from Users
+where email = 'admin@test.com' and firstName = 'admin';
