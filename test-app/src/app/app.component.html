@@ -1,11 +1,12 @@
-<app-header></app-header>
+<app-header (sidenavToggle)="sidenav.toggle()"></app-header>
 
 <mat-sidenav-container>
-  <mat-sidenav mode="side"
+  <mat-sidenav mode="over"
     align="start"
-    closed
+    #sidenav
     class="mat-elevation-z3">
-    <app-menu [mode]="'vertical'"></app-menu>
+    <app-menu [mode]="'vertical'"
+      (sidenavToggle)="sidenav.toggle()"></app-menu>
   </mat-sidenav>
 
   <mat-sidenav-content>

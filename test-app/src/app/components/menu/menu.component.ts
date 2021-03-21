@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { UserDto } from '../../models/user.model';
 import { AuthService } from '../../auth/auth.service';
@@ -10,6 +10,7 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class MenuComponent implements OnInit {
   @Input() mode = 'horizontal';
+  @Output() sidenavToggle = new EventEmitter();
 
   user: UserDto;
 
@@ -21,4 +22,8 @@ export class MenuComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  onToggleSidenav() {
+    this.sidenavToggle.emit();
+  }
 }

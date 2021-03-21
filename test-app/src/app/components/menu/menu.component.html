@@ -4,13 +4,15 @@
   <div *ngIf="user?.isAdmin">
     <a mat-button
       [routerLink]="['/dealers']"
-      routerLinkActive="active">
+      routerLinkActive="active"
+      (click)="onToggleSidenav()">
       Directorio de Dealers
     </a>
 
     <a mat-button
       [routerLink]="['/users']"
-      routerLinkActive="active">
+      routerLinkActive="active"
+      (click)="onToggleSidenav()">
       Usuarios
     </a>
   </div>
@@ -18,7 +20,8 @@
   <a mat-button
     [routerLink]="['/dealers/user']"
     routerLinkActive="active"
-    *ngIf="user && !user?.isAdmin">
+    *ngIf="user && !user?.isAdmin"
+    (click)="onToggleSidenav()">
     Mi Dealer
   </a>
 

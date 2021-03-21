@@ -70,7 +70,7 @@ export class LoginComponent {
         }
       },
       (error) => {
-        console.log(error);
+        this.errores.push(error.error?.message);
         this.loginForm.reset();
       }
     );
