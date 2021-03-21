@@ -25,52 +25,28 @@ class User {
 	createUser = (newUser) => {
 		return new Promise((resolve, reject) => {
 			try {
-				db.beginTransaction((err) => {
-					if (err) {
-						reject(err);
-						throw err;
-					}
+				const { dealer: dealerName, ...userData } = newUser;
+				const sql = 'CALL CREATE_USER_DEALER(?,?,?,?,?,?)';
 
-					const { dealer: dealerName, ...userData } = newUser;
-
-					const sql = 'INSERT INTO Users SET ?';
-
-					db.query(sql, [userData], (error, rows) => {
-						if (error) {
-							return db.rollback(() => {
-								reject(error);
-								throw error;
-							});
+				db.query(
+					sql,
+					[
+						userData.firstName,
+						userData.lastName,
+						userData.email,
+						userData.password,
+						userData.age,
+						dealerName,
+					],
+					(err, rows) => {
+						if (err) {
+							reject(err);
+							throw err;
 						}
 
-						const newDealer = {
-							name: dealerName,
-							userId: rows.insertId,
-						};
-
-						const sql = 'INSERT INTO Dealers SET ?';
-
-						db.query(sql, [newDealer], (error, rows) => {
-							if (error) {
-								return db.rollback(() => {
-									reject(error);
-									throw error;
-								});
-							}
-
-							db.commit((err) => {
-								if (err) {
-									return db.rollback(() => {
-										reject(error);
-										throw error;
-									});
-								}
-
-								return resolve(rows);
-							});
-						});
-					});
-				});
+						return resolve(rows);
+					}
+				);
 			} catch (error) {
 				reject(error);
 				throw error;

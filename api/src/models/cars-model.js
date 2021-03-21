@@ -4,52 +4,27 @@ class Car {
 	createCar = (newCar) => {
 		return new Promise((resolve, reject) => {
 			try {
-				db.beginTransaction((err) => {
-					if (err) {
-						reject(err);
-						throw err;
-					}
+				const { dealerId, ...carData } = newCar;
+				const sql = 'CALL CREATE_CAR_DEALER(?,?,?,?,?)';
 
-					const { dealerId, ...carData } = newCar;
-
-					const sql = 'INSERT INTO Cars SET ?';
-
-					db.query(sql, [carData], (error, rows) => {
-						if (error) {
-							return db.rollback(() => {
-								reject(error);
-								throw error;
-							});
+				db.query(
+					sql,
+					[
+						carData.year,
+						carData.color,
+						carData.carModelId,
+						carData.createdById,
+						dealerId,
+					],
+					(err, rows) => {
+						if (err) {
+							reject(err);
+							throw err;
 						}
 
-						const newDealerCar = {
-							carId: rows.insertId,
-							dealerId: dealerId,
-						};
-
-						const sql = 'INSERT INTO Dealer_Cars SET ?';
-
-						db.query(sql, [newDealerCar], (error, rows) => {
-							if (error) {
-								return db.rollback(() => {
-									reject(error);
-									throw error;
-								});
-							}
-
-							db.commit((err) => {
-								if (err) {
-									return db.rollback(() => {
-										reject(error);
-										throw error;
-									});
-								}
-
-								return resolve(rows);
-							});
-						});
-					});
-				});
+						return resolve(rows);
+					}
+				);
 			} catch (error) {
 				reject(error);
 				throw error;
@@ -126,8 +101,12 @@ class Car {
                 select
                     c.*,
                     cb.name as Brand,
-                    cm.name as Model
-                from cars c 
+                    cm.name as Model,
+					dc.dealerId,
+					d.name as dealer
+                from cars c
+				left join dealer_cars dc on dc.carId = c.id
+				left join dealers d on d.id = dc.dealerId
                 left join carbrand_models cm on cm.id = c.carModelId
                 left join carbrands cb on cb.id = cm.brandId`;
 
