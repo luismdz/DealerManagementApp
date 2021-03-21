@@ -9,10 +9,10 @@ exports.createCar = (req, res) => {
 
 	const { year, carModelId, color, dealerId } = req.body;
 
-	if ((!year || !carModelId, !color)) {
-		return res
-			.status(400)
-			.json({ message: 'All fields [year, carModelId, color] are required' });
+	if ((!year || !carModelId, !color, !dealerId)) {
+		return res.status(400).json({
+			message: 'All fields [year, carModelId, color, dealerId] are required',
+		});
 	}
 
 	const newCar = {
@@ -44,21 +44,18 @@ exports.getCarBrands = async (req, res) => {
 		let brands = await carsModel.getCarBrands();
 
 		if (brands && brands.length > 0) {
-			brands = await Promise.all(
-				brands.map(async (brand) => {
-					const models = await carsModel.getCarModelsByBrandId(brand.id);
-
-					return {
-						...brand,
-						models,
-					};
-				})
-			);
-
-			return res.status(200).json(brands);
-		} else {
-			return res.status(204);
+			// brands = await Promise.all(
+			// 	brands.map(async (brand) => {
+			// 		const models = await carsModel.getCarModelsByBrandId(brand.id);
+			// 		return {
+			// 			...brand,
+			// 			models,
+			// 		};
+			// 	})
+			// );
 		}
+
+		return res.status(200).json(brands);
 	} catch (error) {
 		res.status(400).json({
 			error: 'Invalid request',
@@ -81,8 +78,6 @@ exports.getCarModelsByBrandId = (req, res) => {
 			res.status(400).json({ message: 'Invalid request', error: error })
 		);
 };
-
-// exports.getCarModels = (req, res) => {};
 
 exports.getById = (req, res) => {
 	const id = req.params.id;

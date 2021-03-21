@@ -52,18 +52,18 @@ exports.login = (req, res) => {
 };
 
 exports.createUser = (req, res) => {
-	const { isAdmin, userId } = req.userData;
+	const { isAdmin } = req.userData;
 
 	if (!isAdmin) {
 		return res.status(401).json({ message: 'Auth invalid' });
 	}
 
-	const { firstName, lastName, email, age, password } = req.body;
+	const { firstName, lastName, email, age, password, dealer } = req.body;
 
 	if (!firstName || !lastName || !email || !password) {
 		return res.status(400).json({
 			message:
-				'All the fields [firstName, lastName, email, password] are required',
+				'All the fields [firstName, lastName, email, password, dealer] are required',
 		});
 	}
 
@@ -76,6 +76,7 @@ exports.createUser = (req, res) => {
 				email,
 				password: hash,
 				age,
+				dealer,
 			};
 
 			userModel
@@ -92,11 +93,19 @@ exports.createUser = (req, res) => {
 };
 
 exports.getUsers = (req, res) => {
+	const { isAdmin } = req.userData;
+
+	if (!isAdmin) {
+		return res.status(401).json({ message: 'Not enough privileges' });
+	}
+
 	userModel
 		.getAll()
 		.then((users) => {
 			users = users.map((user) => {
 				const { password, ...userWithoutPassword } = user;
+				userWithoutPassword.isAdmin = isAdmin ? true : false;
+
 				return userWithoutPassword;
 			});
 
@@ -106,7 +115,13 @@ exports.getUsers = (req, res) => {
 };
 
 exports.getById = (req, res) => {
+	const { userId, isAdmin } = req.userData;
+
 	const id = req.params.id;
+
+	if (!isAdmin && id != userId) {
+		return res.status(401).json({ message: 'Auth failed' });
+	}
 
 	userModel
 		.getUserById(id)
@@ -117,6 +132,8 @@ exports.getById = (req, res) => {
 				});
 			}
 			const { password, ...userWithoutPassword } = user;
+			userWithoutPassword.isAdmin = isAdmin ? true : false;
+
 			return res.status(200).json(userWithoutPassword);
 		})
 		.catch((err) =>
@@ -128,13 +145,12 @@ exports.getById = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-	// const { isAdmin } = req.userData;
-
-	// if (!isAdmin) {
-	// 	return res.status(401).json({ message: 'Auth invalid' });
-	// }
-
+	const { isAdmin, userId } = req.userData;
 	const id = req.params.id;
+
+	if (!isAdmin && id != userId) {
+		return res.status(401).json({ message: 'Auth invalid' });
+	}
 
 	const user = {
 		firstName: req.body.firstName,

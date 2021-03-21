@@ -1,0 +1,59 @@
+<div class="form-container">
+
+  <form [formGroup]="form"
+    (ngSubmit)="editUser()"
+    class="mat-elevation-z1">
+
+    <h2>Editar Perfil</h2>
+
+    <mat-form-field>
+      <mat-label>Nombre</mat-label>
+      <input type="text"
+        matInput
+        formControlName="firstName">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Apellido</mat-label>
+      <input type="text"
+        matInput
+        formControlName="lastName">
+    </mat-form-field>
+
+    <mat-form-field class="w-50">
+      <mat-label>Edad</mat-label>
+      <input type="number"
+        matInput
+        formControlName="age">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Correo Electrónico</mat-label>
+      <input type="email"
+        matInput
+        formControlName="email">
+    </mat-form-field>
+
+    <mat-form-field *ngIf="!user?.isAdmin">
+      <mat-label>Dealer en que labora</mat-label>
+      <input type="text"
+        matInput
+        formControlName="dealer">
+    </mat-form-field>
+
+    <button mat-raised-button
+      color="primary"
+      [disabled]="form.invalid">
+      Editar
+    </button>
+
+    <button mat-raised-button
+      type="button"
+      color="warn"
+      (click)="onCancel()">
+      Cancelar
+    </button>
+
+  </form>
+
+</div>

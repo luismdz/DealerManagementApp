@@ -1,0 +1,10 @@
+<h2>Dealers</h2>
+
+<button mat-raised-button
+  color="primary"
+  [routerLink]="['new']">
+  Nuevo Dealer
+</button>
+
+<app-dealer-list [dealers]="dealers$ | async"
+  (delete)="onDelete($event)"></app-dealer-list>

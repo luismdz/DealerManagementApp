@@ -16,7 +16,10 @@ class Dealer {
 
 	getAll = () => {
 		return new Promise((resolve, reject) => {
-			const sql = `select id, name from Dealers`;
+			const sql = `
+					select id, name, userId 
+					from Dealers 
+					where status = 1`;
 
 			db.query(sql, (err, rows) => {
 				if (err) {
@@ -30,14 +33,17 @@ class Dealer {
 
 	getDealerByUserId = (userId) => {
 		return new Promise((resolve, reject) => {
-			const sql = `select id, name from Dealers where userId = ?`;
+			const sql = `
+				select id, name 
+				from Dealers 
+				where userId = ? and status = 1`;
 
 			db.query(sql, [userId], (err, rows) => {
 				if (err) {
 					reject(err);
 					throw err;
 				}
-				return resolve(rows);
+				return resolve(rows[0]);
 			});
 		});
 	};
@@ -45,7 +51,7 @@ class Dealer {
 	getDealerById = (id) => {
 		return new Promise((resolve, reject) => {
 			const sql = `select * from Dealers d 
-						where id = ?`;
+						where id = ? and status = 1`;
 			db.query(sql, [id], (err, rows) => {
 				if (err) {
 					reject(err);
@@ -59,7 +65,7 @@ class Dealer {
 	getDealerByName = (name) => {
 		return new Promise((resolve, reject) => {
 			const sql = `select id, name from Dealers d 
-						where name like '%${name}%'`;
+						where name like '%${name}%' and status = 1`;
 			db.query(sql, (err, rows) => {
 				if (err) {
 					reject(err);
@@ -90,7 +96,7 @@ class Dealer {
 					UPDATE Dealers
 					SET ${columnSet}
 					WHERE id = ?`;
-				return db.query(sql, [values, id], (err, rows) => {
+				return db.query(sql, [...values, id], (err, rows) => {
 					if (err) {
 						reject(err);
 						throw err;
@@ -104,8 +110,8 @@ class Dealer {
 
 	deleteDealer = (id) => {
 		return new Promise((resolve, reject) => {
-			const sql = 'DELETE FROM Dealers WHERE id = ?';
-			return db.query(sql, [id], (err, rows) => {
+			const sql = 'UPDATE Dealers SET status = ? WHERE id = ?';
+			return db.query(sql, [0, id], (err, rows) => {
 				if (err) {
 					reject(err);
 					throw err;

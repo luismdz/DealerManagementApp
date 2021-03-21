@@ -1,0 +1,16 @@
+<app-header></app-header>
+
+<mat-sidenav-container>
+  <mat-sidenav mode="side"
+    align="start"
+    closed
+    class="mat-elevation-z3">
+    <app-menu [mode]="'vertical'"></app-menu>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

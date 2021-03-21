@@ -1,0 +1,23 @@
+.form-container {
+
+  form {
+    padding: 1rem 1.5rem;
+    width: min(100%, 500px);
+    // margin: auto;
+
+    mat-form-field {
+      width: 100%;
+      display: block;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .w-50 {
+      width: min(100%, 200px);
+    }
+  }
+
+}

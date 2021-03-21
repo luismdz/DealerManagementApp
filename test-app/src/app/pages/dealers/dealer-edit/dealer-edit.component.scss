@@ -1,0 +1,14 @@
+form {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 400px);
+  padding: 1.5rem;
+
+  mat-form-field {
+    margin-bottom: .75rem;
+  }
+
+  button {
+    margin-bottom: .75rem;
+  }
+}

@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 
 const userRoutes = require('./routes/users-routes');
 const carRoutes = require('./routes/cars-route');
@@ -6,6 +7,7 @@ const dealerRoutes = require('./routes/dealers-route');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const PORT = +process.env.PORT || 3000;
 

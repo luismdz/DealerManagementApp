@@ -24,16 +24,57 @@ class User {
 
 	createUser = (newUser) => {
 		return new Promise((resolve, reject) => {
-			const sql = 'INSERT INTO Users SET ?';
+			try {
+				db.beginTransaction((err) => {
+					if (err) {
+						reject(err);
+						throw err;
+					}
 
-			db.query(sql, [newUser], (err, rows) => {
-				if (err) {
-					reject(err);
-					throw err;
-				}
+					const { dealer: dealerName, ...userData } = newUser;
 
-				return resolve(rows);
-			});
+					const sql = 'INSERT INTO Users SET ?';
+
+					db.query(sql, [userData], (error, rows) => {
+						if (error) {
+							return db.rollback(() => {
+								reject(error);
+								throw error;
+							});
+						}
+
+						const newDealer = {
+							name: dealerName,
+							userId: rows.insertId,
+						};
+
+						const sql = 'INSERT INTO Dealers SET ?';
+
+						db.query(sql, [newDealer], (error, rows) => {
+							if (error) {
+								return db.rollback(() => {
+									reject(error);
+									throw error;
+								});
+							}
+
+							db.commit((err) => {
+								if (err) {
+									return db.rollback(() => {
+										reject(error);
+										throw error;
+									});
+								}
+
+								return resolve(rows);
+							});
+						});
+					});
+				});
+			} catch (error) {
+				reject(error);
+				throw error;
+			}
 		});
 	};
 
@@ -42,8 +83,10 @@ class User {
 			const sql = `
 				select
 					u.*,
-					d.name as dealer
+					d.name as dealer,
+					adm.status as isAdmin
 				from users u
+				left join admins adm on adm.userId = u.id
 				left join dealers d on d.userId = u.id`;
 
 			db.query(sql, (err, rows) => {
@@ -61,8 +104,10 @@ class User {
 			const sql = `
 				select
 					u.*,
-					d.name as dealer
+					d.name as dealer,
+					adm.status as isAdmin
 				from users u
+				left join admins adm on adm.userId = u.id
 				left join dealers d on d.userId = u.id
 				where u.id = ?`;
 
@@ -96,13 +141,11 @@ class User {
 					UPDATE users
 					SET ${columnSet}
 					WHERE id = ?`;
-
-				return db.query(sql, [values, id], (err, rows) => {
+				return db.query(sql, [...values, id], (err, rows) => {
 					if (err) {
 						reject(err);
 						throw err;
 					}
-
 					resolve(rows);
 				});
 			} else return reject('No values provided');

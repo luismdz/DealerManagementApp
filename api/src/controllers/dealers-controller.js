@@ -1,23 +1,23 @@
-const dealersModel = require('../models/dealers-model');
 const dealerModel = require('../models/dealers-model');
+const carModel = require('../models/cars-model');
 
 exports.createDealer = async (req, res) => {
-	const { userId } = req.userData;
+	const { isAdmin } = req.userData;
 
-	if (!userId) {
+	if (!isAdmin) {
 		return res.status(401).json({ message: 'Auth invalid' });
 	}
 
 	const newDealer = {
 		name: req.body.name,
-		userId: userId,
+		userId: req.body.userId,
 	};
 
-	if (!newDealer.name) {
-		return res.status(400).json({ message: 'Name is required' });
+	if (!newDealer.name || !newDealer.userId) {
+		return res.status(400).json({ message: 'Name and UserId are required' });
 	}
 
-	const userHasDealer = await dealerModel.getDealerByUserId(userId);
+	const userHasDealer = await dealerModel.getDealerByUserId(newDealer.userId);
 
 	if (userHasDealer) {
 		return res
@@ -48,7 +48,7 @@ exports.getDealers = (req, res) => {
 		.catch((error) => res.status(400).json({ message: error }));
 };
 
-exports.getDealersByUserId = (req, res) => {
+exports.getDealerByUserId = (req, res) => {
 	const { userId } = req.userData;
 
 	if (!userId) {
@@ -62,23 +62,66 @@ exports.getDealersByUserId = (req, res) => {
 };
 
 exports.getDealerById = (req, res) => {
-	// const { userId } = req.userData;
-
-	// if (!userId) {
-	// 	return res.status(401).json({ message: 'Auth failed' });
-	// }
+	const { userId, isAdmin } = req.userData;
 	const id = req.params.id;
 
 	dealerModel
 		.getDealerById(id)
 		.then((dealer) => {
-			const { dealerUserId, dealerStatus, ...dealerDto } = dealer;
+			if (!dealer) {
+				return res.status(404).json({ message: 'Dealer not found' });
+			}
+
+			const { dealerStatus, ...dealerDto } = dealer;
+
+			if (!isAdmin && dealerUserId != userId) {
+				return res.status(401).json({ message: 'Auth Failed' });
+			}
 
 			return res.status(200).json(dealerDto);
 		})
 		.catch((error) => res.status(400).json({ message: error }));
 };
 
+// Get dealer stock (cars available)
+exports.getDealerStock = async (req, res) => {
+	try {
+		const id = req.params.id;
+		if (!id) {
+			return res.status(400).json({ message: 'Invalid request' });
+		}
+
+		const dealer = await dealerModel.getDealerById(id);
+
+		if (!dealer) {
+			return res.status(404).json({ message: 'Dealer not found' });
+		}
+
+		let stock = await carModel.getCarsByDealerId(dealer.id);
+
+		stock = stock.map((car) => {
+			return {
+				id: car.id,
+				brand: car.brand,
+				model: car.model,
+				color: car.color,
+				year: car.year,
+			};
+		});
+
+		const dealerStock = {
+			...dealer,
+			stock,
+		};
+
+		return res.status(200).json(dealerStock);
+	} catch (error) {
+		res.status(400).json({ message: 'Invalid Request', error: error });
+		throw error;
+	}
+};
+
+// Update dealer
 exports.updateDealer = async (req, res) => {
 	const { userId } = req.userData;
 
@@ -89,7 +132,7 @@ exports.updateDealer = async (req, res) => {
 	try {
 		const id = req.params.id;
 
-		const dealerFromDb = await dealersModel.getDealerById(id);
+		const dealerFromDb = await dealerModel.getDealerById(id);
 
 		if (!dealerFromDb) {
 			return res.status(404).json({ message: 'Dealer not found' });
@@ -117,24 +160,21 @@ exports.updateDealer = async (req, res) => {
 	}
 };
 
+// Delete dealer
 exports.deleteDealer = async (req, res) => {
-	const { userId } = req.userData;
+	const { isAdmin } = req.userData;
 
-	if (!userId) {
+	if (!isAdmin) {
 		return res.status(401).json({ message: 'Auth failed' });
 	}
 
 	try {
 		const id = req.params.id;
 
-		const dealerFromDb = await dealersModel.getDealerById(id);
+		const dealerFromDb = await dealerModel.getDealerById(id);
 
 		if (!dealerFromDb) {
 			return res.status(404).json({ message: 'Dealer not found' });
-		}
-
-		if (dealerFromDb.userId !== userId) {
-			return res.status(401).json({ message: 'Auth failed' });
 		}
 
 		dealerModel
