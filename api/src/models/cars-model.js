@@ -108,7 +108,8 @@ class Car {
 				left join dealer_cars dc on dc.carId = c.id
 				left join dealers d on d.id = dc.dealerId
                 left join carbrand_models cm on cm.id = c.carModelId
-                left join carbrands cb on cb.id = cm.brandId`;
+                left join carbrands cb on cb.id = cm.brandId
+				order by c.createdAt desc`;
 
 			db.query(sql, (err, rows) => {
 				if (err) {
@@ -125,6 +126,7 @@ class Car {
 			const sql = `
 				select
 					c.id,
+					c.carModelId,
 					cb.name as brand,
 					cm.name as model,
 					c.color,
@@ -160,6 +162,7 @@ class Car {
 					cm.name as model,
 					c.color,
 					c.year,
+					c.carModelId,
 					dc.dealerId,
 					d.name as Dealer,
 					c.createdById,
@@ -169,7 +172,8 @@ class Car {
 			left join dealers d on d.id = dc.dealerId
 			left join carbrand_models cm on cm.id = c.carModelId
 			left join carbrands cb on cb.id = cm.brandId
-			where d.id = ?`;
+			where d.id = ?
+			order by c.createdAt desc`;
 
 			db.query(sql, [id], (err, rows) => {
 				if (err) {

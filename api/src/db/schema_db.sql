@@ -9,7 +9,8 @@ create table Users (
     lastName varchar(128) not null,
     email varchar(128) not null unique,
     password varchar(256) not null,
-    age tinyint not null default 0
+    age tinyint not null default 0,
+    status boolean not null default 1
 );
 
 create table Admins (
@@ -92,7 +93,7 @@ begin
     declare exit handler for sqlexception
     begin
 		rollback;
-		select MYSQL_ERRNO, MESSAGE_TEXT;
+		select 'Error occured';
     end;
     
 	start transaction;
@@ -129,7 +130,7 @@ begin
     declare exit handler for sqlexception
     begin
 		rollback;
-		select MYSQL_ERRNO, MESSAGE_TEXT;
+		select 'Error occured';
     end;
     
 	start transaction;

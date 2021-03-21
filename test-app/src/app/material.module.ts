@@ -13,6 +13,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 @NgModule({
   declarations: [],
   imports: [CommonModule],
@@ -30,6 +32,7 @@ import { MatStepperModule } from '@angular/material/stepper';
     MatDividerModule,
     MatIconModule,
     MatStepperModule,
+    MatTooltipModule,
   ],
 })
 export class MaterialModule {}

@@ -1,4 +1,5 @@
 const userModel = require('../models/users-model');
+const dealerModel = require('../models/dealers-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const _key = 'SJHAU8hushs8dnksjd99JD8IJHSD89dmmkjkhfsdkfhs';
@@ -51,7 +52,7 @@ exports.login = (req, res) => {
 		);
 };
 
-exports.createUser = (req, res) => {
+exports.createUser = async (req, res) => {
 	const { isAdmin } = req.userData;
 
 	if (!isAdmin) {
@@ -67,13 +68,27 @@ exports.createUser = (req, res) => {
 		});
 	}
 
+	const userExists = await userModel.getUserByEmail(email);
+
+	if (userExists) {
+		return res.status(400).json({
+			error: 'User alrealy exists',
+			message: userExists.status === 0 ? 'User is disabled' : '',
+		});
+	}
+
+	const nameExists = await dealerModel.getDealerByName(dealer);
+	if (nameExists) {
+		return res.status(400).json({ message: 'Dealer name is already taken' });
+	}
+
 	bcrypt
 		.hash(password, 10)
 		.then((hash) => {
 			const newUser = {
 				firstName,
 				lastName,
-				email,
+				email: email.toLowerCase(),
 				password: hash,
 				age,
 				dealer,
@@ -158,6 +173,7 @@ exports.updateUser = (req, res) => {
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
 		age: req.body.age,
+		status: 1,
 	};
 
 	userModel

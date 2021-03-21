@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DealerService } from '../../../services/dealer.service';
 import { DealerDto } from '../../../models/dealer.model';
 import { switchMap } from 'rxjs/operators';
+import { CarDto } from '../../../models/car.model';
+import { CarService } from '../../../services/car.service';
 
 @Component({
   selector: 'app-dealer-details',
@@ -16,8 +18,15 @@ export class DealerDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dealerSvc: DealerService
+    private dealerSvc: DealerService,
+    private carSvc: CarService
   ) {
+    this.loadData();
+  }
+
+  ngOnInit(): void {}
+
+  loadData() {
     this.routePath = this.route.snapshot.routeConfig.path;
 
     this.route.params.subscribe((params) => {
@@ -55,5 +64,10 @@ export class DealerDetailsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  onDeleteCar(car: CarDto) {
+    this.carSvc.deleteCar(car.id).subscribe(
+      () => this.loadData(),
+      (error) => console.log(error)
+    );
+  }
 }
