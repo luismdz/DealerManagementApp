@@ -12,7 +12,8 @@
 
   <div class="stock">
     <h3>Inventario de Vehiculos</h3>
-    <app-car-list [cars]="dealer.stock"></app-car-list>
+    <app-car-list [cars]="dealer.stock"
+      (deleteCar)="onDeleteCar($event)"></app-car-list>
   </div>
 
 </div>
