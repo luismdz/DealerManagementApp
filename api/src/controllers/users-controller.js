@@ -104,7 +104,9 @@ exports.getUsers = (req, res) => {
 		.then((users) => {
 			users = users.map((user) => {
 				const { password, ...userWithoutPassword } = user;
-				userWithoutPassword.isAdmin = isAdmin ? true : false;
+				userWithoutPassword.isAdmin = userWithoutPassword.isAdmin
+					? true
+					: false;
 
 				return userWithoutPassword;
 			});
@@ -132,7 +134,7 @@ exports.getById = (req, res) => {
 				});
 			}
 			const { password, ...userWithoutPassword } = user;
-			userWithoutPassword.isAdmin = isAdmin ? true : false;
+			userWithoutPassword.isAdmin = userWithoutPassword.isAdmin ? true : false;
 
 			return res.status(200).json(userWithoutPassword);
 		})
