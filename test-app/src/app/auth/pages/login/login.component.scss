@@ -10,3 +10,15 @@ form {
     width: 100%;
   }
 }
+
+.error-list {
+  list-style: none;
+  width: 100%;
+  margin: .5rem 0;
+  padding: 0;
+}
+
+.error-list li {
+  font-size: 12px;
+  margin-bottom: .25rem;
+}

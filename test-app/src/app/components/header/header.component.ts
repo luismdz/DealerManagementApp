@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AuthService } from '../../auth/auth.service';
 import { UserDto } from '../../models/user.model';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
   user: UserDto;
+  @Output() sidenavToggle = new EventEmitter();
 
   constructor(public authSvc: AuthService, private router: Router) {
     this.authSvc.currentUser$.subscribe((user) => {
@@ -23,5 +24,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  onToggleSidenav() {}
+  onToggleSidenav() {
+    this.sidenavToggle.emit();
+  }
 }

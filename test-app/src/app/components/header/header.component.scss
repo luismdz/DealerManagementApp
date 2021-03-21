@@ -4,10 +4,22 @@
 
 .logo {
   margin-right: 1rem;
+  padding-left: 0;
+
+  img {
+    width: 25px;
+    margin: 0 .25rem;
+  }
 }
 
 .nav {
   display: flex;
+  align-items: center;
   margin: auto;
-  width: min(1440px, 90%);
+  width: min(1440px, 100%);
+}
+
+.menu-trigger {
+  display: flex;
+  align-items: center;
 }

@@ -1,24 +1,26 @@
 <mat-toolbar color="primary">
 
   <div class="nav">
-    <!-- <button mat-icon-button
-    fxShow
-    fxHide.gt-sm
-    (click)="onToggleSidenav()">
-    <mat-icon>menu</mat-icon>
-  </button> -->
+    <button mat-icon-button
+      fxShow
+      fxHide.gt-xs
+      (click)="onToggleSidenav()">
+      <mat-icon>menu</mat-icon>
+    </button>
 
-    <span class="logo">
-      <a mat-button
-        routerLink='/'>
-        <!-- <mat-icon></mat-icon> -->
-        <span class="title">
-          Dealers App
-        </span>
-      </a>
-    </span>
+    <a mat-button
+      class="logo"
+      routerLink='/'>
+      <!-- <mat-icon></mat-icon> -->
+      <img src="/assets/img/car.png"
+        alt="Car Dealer">
+      <span class="title">
+        Dealers App
+      </span>
+    </a>
 
-    <app-menu></app-menu>
+    <app-menu fxHide
+      fxShow.gt-xs></app-menu>
 
     <span class="spacer"></span>
 
@@ -29,6 +31,7 @@
     </button>
 
     <button mat-button
+      class="menu-trigger"
       [matMenuTriggerFor]="menuRef"
       *ngIf="user">
       <span>Hola, {{ user.email }}</span>

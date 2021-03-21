@@ -26,11 +26,14 @@ export class AdminGuard implements CanActivate {
     | UrlTree {
     return this.authSvc.currentUser$.pipe(
       map((user) => {
-        if (!user.isAdmin) {
-          this.router.navigateByUrl('/dealers/user');
+        if (user) {
+          if (!user.isAdmin) {
+            this.router.navigateByUrl('/dealers/user');
+            return false;
+          }
+          return true;
         }
-
-        return user.isAdmin;
+        return false;
       })
     );
   }
