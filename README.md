@@ -1,4 +1,4 @@
-## Prueba Tecnica de Lidax Consulting
+## Dealer Management App
 
 Tecnologias:
 
